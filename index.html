@@ -706,160 +706,152 @@
 				</div>
 			</div>
 		</div>
-		<!-- Botão de WhatsApp -->
-		<button id="whatsappButton" style="display:none;" onclick="sendWhatsApp()">Enviar via WhatsApp</button>
-		<div class="result" id="result"></div>
-	</main>
-	<footer> Cuide da sua saúde emocional com quem entende. Siga @ricmurtapsicologia para mais insights transformadores. Direitos reservados 2024. </footer>
-	<script type="module">
-		// Import Firebase SDKs
-		import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
-		import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
-		
-		// Firebase configuration
-		const firebaseConfig = {
-		    apiKey: "AIzA...Fh7Y",
-		    authDomain: "escala-emocional.firebaseapp.com",
-		    projectId: "escala-emocional",
-		    storageBucket: "escala-emocional.appspot.com",
-		    messagingSenderId: "707186007593",
-		    appId: "1:707186007593:web:007c0442e1a793e9f54638"
-		};
-		
-		// Initialize Firebase
-		const app = initializeApp(firebaseConfig);
-		const db = getFirestore(app);
-		
-		document.getElementById('emotionScale').addEventListener('submit', async function (event) {
-		    event.preventDefault();
-		
-		    const name = document.getElementById('name').value;
-		    const age = document.getElementById('age').value;
-		    const date = document.getElementById('date').value;
-		
-		    const scores = {
-		        security: 0,
-		        connection: 0,
-		        validation: 0,
-		        autonomy: 0,
-		        purpose: 0,
-		        support: 0,
-		        expression: 0,
-		        novelty: 0,
-		        growth: 0
-		    };
-		
-		    const invertedQuestions = {
-		        q2: true, q4: true, q6: true, q8: true, q10: true, q12: true, q14: true,
-		        q16: true, q18: true, q20: true, q22: true, q24: true, q26: true, q28: true,
-		        q30: true, q32: true, q34: true, q36: true
-		    };
-		
-		    const answers = new FormData(event.target);
-		    const responseData = {};
-		
-		    // Calcular pontuações e preparar dados
-		    for (let [key, value] of answers.entries()) {
-		        let score = parseInt(value);
-		        if (invertedQuestions[key]) {
-		            score = 6 - score;
-		        }
-		        responseData[key] = score;
-		
-		        // Categorizar as perguntas em grupos
-		        if (["q1", "q2", "q3", "q4"].includes(key)) {
-		            scores.security += score;
-		        } else if (["q5", "q6", "q7", "q8"].includes(key)) {
-		            scores.connection += score;
-		        } else if (["q9", "q10", "q11", "q12"].includes(key)) {
-		            scores.validation += score;
-		        } else if (["q13", "q14", "q15", "q16"].includes(key)) {
-		            scores.autonomy += score;
-		        } else if (["q17", "q18", "q19", "q20"].includes(key)) {
-		            scores.purpose += score;
-		        } else if (["q21", "q22", "q23", "q24"].includes(key)) {
-		            scores.support += score;
-		        } else if (["q25", "q26", "q27", "q28"].includes(key)) {
-		            scores.expression += score;
-		        } else if (["q29", "q30", "q31", "q32"].includes(key)) {
-		            scores.novelty += score;
-		        } else if (["q33", "q34", "q35", "q36"].includes(key)) {
-		            scores.growth += score;
-		        }
-		    }
-		
-		    // Atualizar termômetros
-		    updateThermometer("thermometer1", scores.security, 'explanation1', 4);
-		    updateThermometer("thermometer2", scores.connection, 'explanation2', 4);
-		    updateThermometer("thermometer3", scores.validation, 'explanation3', 4);
-		    updateThermometer("thermometer4", scores.autonomy, 'explanation4', 4);
-		    updateThermometer("thermometer5", scores.purpose, 'explanation5', 4);
-		    updateThermometer("thermometer6", scores.support, 'explanation6', 4);
-		    updateThermometer("thermometer7", scores.expression, 'explanation7', 4);
-		    updateThermometer("thermometer8", scores.novelty, 'explanation8', 4);
-		    updateThermometer("thermometer9", scores.growth, 'explanation9', 4);
-		
-		    try {
-		        // Salvar dados no Firestore
-		        const docRef = await addDoc(collection(db, "respostas"), {
-		            name: name,
-		            age: age,
-		            date: date,
-		            responses: responseData,
-		            scores: scores,
-		            timestamp: new Date()
-		        });
-		        alert(`Respostas salvas com sucesso no Firebase! ID: ${docRef.id}`);
-		    } catch (error) {
-		        console.error("Erro ao salvar os dados:", error);
-		        alert("Erro ao salvar os dados. Verifique o console para mais informações.");
-		    }
-		
-		    // Exibir botão de WhatsApp
-		    document.getElementById("whatsappButton").style.display = "inline-block";
-		});
-		
-		function updateThermometer(id, value, explanationId, totalQuestions) {
-		    const elem = document.getElementById(id);
-		    const percentage = (value / (totalQuestions * 5)) * 100;
-		    let color = "red";
-		
-		    if (percentage >= 80) {
-		        color = "green";
-		    } else if (percentage >= 50) {
-		        color = "yellow";
-		    }
-		
-		    elem.style.width = percentage + "%";
-		    elem.style.backgroundColor = color;
-		
-		    if (percentage < 50) {
-		        document.getElementById(explanationId).style.display = 'block';
-		    } else {
-		        document.getElementById(explanationId).style.display = 'none';
-		    }
-		}
-		
-		function sendWhatsApp() {
-		    const name = document.getElementById('name').value;
-		    const age = document.getElementById('age').value;
-		    const date = document.getElementById('date').value;
-		    const results = `
-		    Segurança e Estabilidade: ${document.getElementById('thermometer1').style.width}
-		    Afeto e Conexão: ${document.getElementById('thermometer2').style.width}
-		    Validação: ${document.getElementById('thermometer3').style.width}
-		    Autonomia: ${document.getElementById('thermometer4').style.width}
-		    Propósito e Direção: ${document.getElementById('thermometer5').style.width}
-		    Apoio e Suporte: ${document.getElementById('thermometer6').style.width}
-		    Expressão e Comunicação: ${document.getElementById('thermometer7').style.width}
-		    Novidade e Desafios: ${document.getElementById('thermometer8').style.width}
-		    Crescimento e Desenvolvimento: ${document.getElementById('thermometer9').style.width}`;
-		
-		    const whatsappMessage = encodeURIComponent(`Nome: ${name}\nIdade: ${age}\nData: ${date}\n${results}`);
-		    const whatsappUrl = `https://wa.me/5535984640729?text=${whatsappMessage}`;
-		
-		    window.open(whatsappUrl, '_blank');
-		}
+		<script type="module">
+    // Import Firebase SDKs
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzA...Fh7Y",
+        authDomain: "escala-emocional.firebaseapp.com",
+        projectId: "escala-emocional",
+        storageBucket: "escala-emocional.appspot.com",
+        messagingSenderId: "707186007593",
+        appId: "1:707186007593:web:007c0442e1a793e9f54638"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.getElementById('emotionScale').addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const age = document.getElementById('age').value;
+        const date = document.getElementById('date').value;
+
+        const scores = {
+            security: 0,
+            connection: 0,
+            validation: 0,
+            autonomy: 0,
+            purpose: 0,
+            support: 0,
+            expression: 0,
+            novelty: 0,
+            growth: 0
+        };
+
+        const explanations = {
+            security: "Segurança e Estabilidade: Reflete sentimentos de confiança e proteção no ambiente.",
+            connection: "Afeto e Conexão: Reflete a habilidade de formar e manter vínculos significativos.",
+            validation: "Validação: Indica o quanto a pessoa sente que seus esforços são reconhecidos.",
+            autonomy: "Autonomia: Representa a capacidade de tomar decisões de forma independente.",
+            purpose: "Propósito e Direção: Relaciona-se com a clareza de objetivos e sentido na vida.",
+            support: "Apoio e Suporte: Indica a disponibilidade de suporte emocional de outros.",
+            expression: "Expressão e Comunicação: Reflete a habilidade de comunicar pensamentos e emoções.",
+            novelty: "Novidade e Desafios: Mostra a busca por experiências novas e aprendizado contínuo.",
+            growth: "Crescimento e Desenvolvimento: Reflete o progresso pessoal e profissional."
+        };
+
+        const interpretations = {
+            low: "Baixo: Pontuação indica dificuldades significativas nesta área.",
+            medium: "Médio: Pontuação indica algumas dificuldades, mas com aspectos positivos.",
+            high: "Alto: Pontuação reflete uma boa saúde emocional nesta área."
+        };
+
+        const invertedQuestions = {
+            q2: true, q4: true, q6: true, q8: true, q10: true, q12: true, q14: true,
+            q16: true, q18: true, q20: true, q22: true, q24: true, q26: true, q28: true,
+            q30: true, q32: true, q34: true, q36: true
+        };
+
+        const answers = new FormData(event.target);
+        const responseData = {};
+        const results = {};
+
+        // Processar respostas
+        for (let [key, value] of answers.entries()) {
+            let score = parseInt(value);
+            if (invertedQuestions[key]) {
+                score = 6 - score;
+            }
+            responseData[key] = score;
+
+            // Categorizar escores
+            if (["q1", "q2", "q3", "q4"].includes(key)) {
+                scores.security += score;
+            } else if (["q5", "q6", "q7", "q8"].includes(key)) {
+                scores.connection += score;
+            } else if (["q9", "q10", "q11", "q12"].includes(key)) {
+                scores.validation += score;
+            } else if (["q13", "q14", "q15", "q16"].includes(key)) {
+                scores.autonomy += score;
+            } else if (["q17", "q18", "q19", "q20"].includes(key)) {
+                scores.purpose += score;
+            } else if (["q21", "q22", "q23", "q24"].includes(key)) {
+                scores.support += score;
+            } else if (["q25", "q26", "q27", "q28"].includes(key)) {
+                scores.expression += score;
+            } else if (["q29", "q30", "q31", "q32"].includes(key)) {
+                scores.novelty += score;
+            } else if (["q33", "q34", "q35", "q36"].includes(key)) {
+                scores.growth += score;
+            }
+        }
+
+        // Interpretar escores
+        for (let [key, value] of Object.entries(scores)) {
+            let interpretation = interpretations.low;
+            if (value >= 13) {
+                interpretation = interpretations.high;
+            } else if (value >= 9) {
+                interpretation = interpretations.medium;
+            }
+            results[key] = {
+                score: value,
+                explanation: explanations[key],
+                interpretation: interpretation
+            };
+        }
+
+        const resultsMessage = `
+        Nome: ${name}
+        Idade: ${age}
+        Data: ${date}
+
+        Resultados:
+        ${Object.entries(results).map(([key, data]) => 
+            `${data.explanation} - Escore: ${data.score} (${data.interpretation})`).join("\n")}`;
+
+        try {
+            // Salvar dados no Firestore
+            await addDoc(collection(db, "respostas"), {
+                name: name,
+                age: age,
+                date: date,
+                responses: responseData,
+                results: results,
+                timestamp: new Date()
+            });
+            alert("Dados salvos com sucesso!");
+
+            // Atualizar botão de WhatsApp
+            const whatsappMessage = encodeURIComponent(resultsMessage);
+            const whatsappUrl = `https://wa.me/5535984640729?text=${whatsappMessage}`;
+            document.getElementById("whatsappButton").onclick = function () {
+                window.open(whatsappUrl, '_blank');
+            };
+            document.getElementById("whatsappButton").style.display = "inline-block";
+        } catch (error) {
+            console.error("Erro ao salvar os dados:", error);
+            alert("Erro ao salvar os dados. Verifique o console para mais informações.");
+        }
+    });
+</script>
+
 	</script>
 </body>
 
