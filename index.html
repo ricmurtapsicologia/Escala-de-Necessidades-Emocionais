@@ -728,12 +728,10 @@
     document.getElementById('emotionScale').addEventListener('submit', async function (event) {
         event.preventDefault();
 
-        // Capture user input
         const name = document.getElementById('name').value;
         const age = document.getElementById('age').value;
         const date = document.getElementById('date').value;
 
-        // Initialize scores and mapping
         const scores = {
             security: 0,
             connection: 0,
@@ -758,12 +756,6 @@
             growth: "Crescimento e Desenvolvimento: Reflete o progresso pessoal e profissional."
         };
 
-        const interpretations = {
-            low: "Baixo: Pontuação indica dificuldades significativas nesta área.",
-            medium: "Médio: Pontuação indica algumas dificuldades, mas com aspectos positivos.",
-            high: "Alto: Pontuação reflete uma boa saúde emocional nesta área."
-        };
-
         const invertedQuestions = {
             q2: true, q4: true, q6: true, q8: true, q10: true, q12: true, q14: true,
             q16: true, q18: true, q20: true, q22: true, q24: true, q26: true, q28: true,
@@ -771,18 +763,12 @@
         };
 
         const answers = new FormData(event.target);
-        const responseData = {};
-        const results = {};
-
-        // Process responses
         for (let [key, value] of answers.entries()) {
             let score = parseInt(value);
             if (invertedQuestions[key]) {
                 score = 6 - score;
             }
-            responseData[key] = score;
 
-            // Categorize scores
             if (["q1", "q2", "q3", "q4"].includes(key)) {
                 scores.security += score;
             } else if (["q5", "q6", "q7", "q8"].includes(key)) {
@@ -804,20 +790,14 @@
             }
         }
 
-        // Interpret scores
-        for (let [key, value] of Object.entries(scores)) {
-            let interpretation = interpretations.low;
-            if (value >= 13) {
-                interpretation = interpretations.high;
-            } else if (value >= 9) {
-                interpretation = interpretations.medium;
+        // Atualizar termômetros
+        Object.entries(scores).forEach(([key, score], index) => {
+            const percentage = (score / 20) * 100; // Assumindo 20 como pontuação máxima
+            const thermometer = document.getElementById(`thermometer${index + 1}`);
+            if (thermometer) {
+                thermometer.style.width = `${percentage}%`;
             }
-            results[key] = {
-                score: value,
-                explanation: explanations[key],
-                interpretation: interpretation
-            };
-        }
+        });
 
         const resultsMessage = `
         Nome: ${name}
@@ -825,34 +805,33 @@
         Data: ${date}
 
         Resultados:
-        ${Object.entries(results).map(([key, data]) => 
-            `${data.explanation} - Escore: ${data.score} (${data.interpretation})`).join("\n")}`;
+        ${Object.entries(scores).map(([key, score]) => `${explanations[key]} - Escore: ${score}`).join("\n")}`;
 
         try {
-            // Save to Firestore
             await addDoc(collection(db, "respostas"), {
-                name: name,
-                age: age,
-                date: date,
-                responses: responseData,
-                results: results,
+                name,
+                age,
+                date,
+                scores,
                 timestamp: new Date()
             });
             alert("Dados salvos com sucesso!");
 
-            // Update WhatsApp button
+            // Atualizar botão WhatsApp
             const whatsappMessage = encodeURIComponent(resultsMessage);
             const whatsappUrl = `https://wa.me/5535984640729?text=${whatsappMessage}`;
-            document.getElementById("whatsappButton").onclick = function () {
+            const whatsappButton = document.getElementById("whatsappButton");
+            whatsappButton.onclick = function () {
                 window.open(whatsappUrl, '_blank');
             };
-            document.getElementById("whatsappButton").style.display = "inline-block";
+            whatsappButton.style.display = "inline-block";
         } catch (error) {
             console.error("Erro ao salvar os dados:", error);
             alert("Erro ao salvar os dados. Verifique o console para mais informações.");
         }
     });
 </script>
+
 
 </body>
 
