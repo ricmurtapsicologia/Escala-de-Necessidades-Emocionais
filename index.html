@@ -149,95 +149,6 @@
 		        margin-bottom: 10px;
 		    }
 		}
-		<script type="module">
-		    // Importar funções necessárias para inicializar o Firebase
-		    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-		    import { getFirestore } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-		
-		    // Configuração do Firebase fornecida
-		    const firebaseConfig = {
-		apiKey: "AIzaSyD7NWmPUbsncDF1tTCkXn46kFh73ooFh7Y",
-		authDomain: "escala-emocional.firebaseapp.com",
-		projectId: "escala-emocional",
-		storageBucket: "escala-emocional.appspot.com",
-		messagingSenderId: "707186007593",
-		appId: "1:707186007593:web:007c044e21a793e9f54638"
-		    };
-		
-		    // Inicializar Firebase
-		    const app = initializeApp(firebaseConfig);
-		    const db = getFirestore(app);
-		
-		    // Funções relacionadas à coleta de dados e Firestore continuam aqui
-		    document.getElementById('emotionScale').addEventListener('submit', async function (event) {
-		event.preventDefault();
-		
-		const scores = {
-		    security: 0,
-		    connection: 0,
-		    validation: 0,
-		    autonomy: 0,
-		    purpose: 0,
-		    support: 0,
-		    expression: 0,
-		    novelty: 0,
-		    growth: 0
-		};
-		
-		const invertedQuestions = {
-		    q2: true, q4: true, q6: true, q8: true, q10: true, q12: true, q14: true,
-		    q16: true, q18: true, q20: true, q22: true, q24: true, q26: true, q28: true,
-		    q30: true, q32: true, q34: true, q36: true
-		};
-		
-		const answers = new FormData(event.target);
-		
-		// Calcular pontuações
-		for (let [key, value] of answers.entries()) {
-		    let score = parseInt(value);
-		    if (invertedQuestions[key]) {
-		        score = 6 - score;
-		    }
-		
-		    if (["q1", "q2", "q3", "q4"].includes(key)) {
-		        scores.security += score;
-		    } else if (["q5", "q6", "q7", "q8"].includes(key)) {
-		        scores.connection += score;
-		    } else if (["q9", "q10", "q11", "q12"].includes(key)) {
-		        scores.validation += score;
-		    } else if (["q13", "q14", "q15", "q16"].includes(key)) {
-		        scores.autonomy += score;
-		    } else if (["q17", "q18", "q19", "q20"].includes(key)) {
-		        scores.purpose += score;
-		    } else if (["q21", "q22", "q23", "q24"].includes(key)) {
-		        scores.support += score;
-		    } else if (["q25", "q26", "q27", "q28"].includes(key)) {
-		        scores.expression += score;
-		    } else if (["q29", "q30", "q31", "q32"].includes(key)) {
-		        scores.novelty += score;
-		    } else if (["q33", "q34", "q35", "q36"].includes(key)) {
-		        scores.growth += score;
-		    }
-		}
-		
-		try {
-		    const userData = {
-		        name: document.getElementById('name').value,
-		        age: document.getElementById('age').value,
-		        date: document.getElementById('date').value,
-		        scores
-		    };
-		
-		    await db.collection("emotion_responses").add(userData);
-		    alert("Dados salvos com sucesso!");
-		    document.getElementById("whatsappButton").style.display = "inline-block";
-		} catch (error) {
-		    console.error("Erro ao salvar dados no Firestore:", error);
-		    alert("Erro ao salvar os dados. Por favor, tente novamente.");
-		}
-		    });
-		</script>
-		
 	</style>
 </head>
 
@@ -795,151 +706,122 @@
 				</div>
 			</div>
 		</div>
-		<script>
-			// Configuração e inicialização do Firebase
-			const firebaseConfig = {
-			    apiKey: "SUA_API_KEY",
-			    authDomain: "SEU_PROJETO.firebaseapp.com",
-			    projectId: "SEU_PROJECT_ID",
-			    storageBucket: "SEU_STORAGE_BUCKET",
-			    messagingSenderId: "SEU_MESSAGING_ID",
-			    appId: "SEU_APP_ID"
-			};
-			
-			// Inicializar Firebase
-			const app = firebase.initializeApp(firebaseConfig);
-			const db = firebase.firestore();
-			
-			document.getElementById('emotionScale').addEventListener('submit', async function (event) {
-			    event.preventDefault();
-			
-			    const scores = {
-			        security: 0,
-			        connection: 0,
-			        validation: 0,
-			        autonomy: 0,
-			        purpose: 0,
-			        support: 0,
-			        expression: 0,
-			        novelty: 0,
-			        growth: 0
-			    };
-			
-			    const invertedQuestions = {
-			        q2: true, q4: true, q6: true, q8: true, q10: true, q12: true, q14: true,
-			        q16: true, q18: true, q20: true, q22: true, q24: true, q26: true, q28: true,
-			        q30: true, q32: true, q34: true, q36: true
-			    };
-			
-			    const answers = new FormData(event.target);
-			
-			    // Calcular as pontuações ajustando as perguntas invertidas
-			    for (let [key, value] of answers.entries()) {
-			        let score = parseInt(value);
-			        if (invertedQuestions[key]) {
-			            score = 6 - score;
-			        }
-			
-			        // Categorizando as perguntas para diferentes necessidades
-			        if (["q1", "q2", "q3", "q4"].includes(key)) {
-			            scores.security += score;
-			        } else if (["q5", "q6", "q7", "q8"].includes(key)) {
-			            scores.connection += score;
-			        } else if (["q9", "q10", "q11", "q12"].includes(key)) {
-			            scores.validation += score;
-			        } else if (["q13", "q14", "q15", "q16"].includes(key)) {
-			            scores.autonomy += score;
-			        } else if (["q17", "q18", "q19", "q20"].includes(key)) {
-			            scores.purpose += score;
-			        } else if (["q21", "q22", "q23", "q24"].includes(key)) {
-			            scores.support += score;
-			        } else if (["q25", "q26", "q27", "q28"].includes(key)) {
-			            scores.expression += score;
-			        } else if (["q29", "q30", "q31", "q32"].includes(key)) {
-			            scores.novelty += score;
-			        } else if (["q33", "q34", "q35", "q36"].includes(key)) {
-			            scores.growth += score;
-			        }
-			    }
-			
-			    // Atualizar termômetros
-			    updateThermometer("thermometer1", scores.security, 'explanation1');
-			    updateThermometer("thermometer2", scores.connection, 'explanation2');
-			    updateThermometer("thermometer3", scores.validation, 'explanation3');
-			    updateThermometer("thermometer4", scores.autonomy, 'explanation4');
-			    updateThermometer("thermometer5", scores.purpose, 'explanation5');
-			    updateThermometer("thermometer6", scores.support, 'explanation6');
-			    updateThermometer("thermometer7", scores.expression, 'explanation7');
-			    updateThermometer("thermometer8", scores.novelty, 'explanation8');
-			    updateThermometer("thermometer9", scores.growth, 'explanation9');
-			
-			    // Salvar dados no Firestore
-			    try {
-			        const userData = {
-			            name: document.getElementById('name').value,
-			            age: document.getElementById('age').value,
-			            date: document.getElementById('date').value,
-			            scores
-			        };
-			
-			        await db.collection("emotion_responses").add(userData);
-			        alert("Dados salvos com sucesso!");
-			
-			        // Exibir botão de WhatsApp
-			        document.getElementById("whatsappButton").style.display = "inline-block";
-			    } catch (error) {
-			        console.error("Erro ao salvar dados no Firestore:", error);
-			        alert("Ocorreu um erro ao salvar os dados. Tente novamente.");
-			    }
-			});
-			
-			function updateThermometer(id, value, explanationId) {
-			    const elem = document.getElementById(id);
-			    const percentage = (value / 20) * 100;
-			    let color = "red";
-			
-			    if (value >= 16) {
-			        color = "green";
-			    } else if (value >= 10) {
-			        color = "yellow";
-			    }
-			
-			    elem.style.width = percentage + "%";
-			    elem.style.backgroundColor = color;
-			
-			    // Mostrar explicação para escores baixos
-			    if (value < 10) {
-			        document.getElementById(explanationId).style.display = 'block';
-			    } else {
-			        document.getElementById(explanationId).style.display = 'none';
-			    }
-			}
-			
-			function sendWhatsApp() {
-			    const name = document.getElementById('name').value;
-			    const age = document.getElementById('age').value;
-			    const date = document.getElementById('date').value;
-			    const message = `Nome: ${name}\nIdade: ${age}\nData: ${date}\nResultados das Necessidades:`;
-			
-			    // Adicionar os resultados
-			    const results = `
-			        Segurança e Estabilidade: ${document.getElementById('thermometer1').style.width}
-			        Afeto e Conexão: ${document.getElementById('thermometer2').style.width}
-			        Validação: ${document.getElementById('thermometer3').style.width}
-			        Autonomia: ${document.getElementById('thermometer4').style.width}
-			        Propósito e Direção: ${document.getElementById('thermometer5').style.width}
-			        Apoio e Suporte: ${document.getElementById('thermometer6').style.width}
-			        Expressão e Comunicação: ${document.getElementById('thermometer7').style.width}
-			        Novidade e Desafios: ${document.getElementById('thermometer8').style.width}
-			        Crescimento e Desenvolvimento: ${document.getElementById('thermometer9').style.width}
-			    `;
-			
-			    const whatsappMessage = encodeURIComponent(message + results);
-			    const whatsappUrl = `https://wa.me/5535984640729?text=${whatsappMessage}`; // Número corrigido para formato internacional
-			
-			    window.open(whatsappUrl, '_blank');
-			}
-		</script>
+		<!-- Botão de WhatsApp -->
+		<button id="whatsappButton" style="display:none;" onclick="sendWhatsApp()">Enviar via WhatsApp</button>
+		<div class="result" id="result"></div>
+	</main>
+	<footer> Cuide da sua saúde emocional com quem entende. Siga @ricmurtapsicologia para mais insights transformadores. Direitos reservados 2024. </footer>
+	<script>
+		document.getElementById('emotionScale').addEventListener('submit', function (event) {
+		    event.preventDefault();
+		
+		    const scores = {
+		 security: 0,
+		 connection: 0,
+		 validation: 0,
+		 autonomy: 0,
+		 purpose: 0,
+		 support: 0,
+		 expression: 0,
+		 novelty: 0,
+		 growth: 0
+		    };
+		
+		    const invertedQuestions = {
+		 q2: true, q4: true, q6: true, q8: true, q10: true, q12: true, q14: true,
+		 q16: true, q18: true, q20: true, q22: true, q24: true, q26: true, q28: true,
+		 q30: true, q32: true, q34: true, q36: true
+		    };
+		
+		    const answers = new FormData(event.target);
+		
+		    // Calcular as pontuações ajustando as perguntas invertidas
+		    for (let [key, value] of answers.entries()) {
+		 let score = parseInt(value);
+		 if (invertedQuestions[key]) {
+		     score = 6 - score;
+		 }
+		
+		 // Categorizar as perguntas em grupos
+		 if (["q1", "q2", "q3", "q4"].includes(key)) {
+		     scores.security += score;
+		 } else if (["q5", "q6", "q7", "q8"].includes(key)) {
+		     scores.connection += score;
+		 } else if (["q9", "q10", "q11", "q12"].includes(key)) {
+		     scores.validation += score;
+		 } else if (["q13", "q14", "q15", "q16"].includes(key)) {
+		     scores.autonomy += score;
+		 } else if (["q17", "q18", "q19", "q20"].includes(key)) {
+		     scores.purpose += score;
+		 } else if (["q21", "q22", "q23", "q24"].includes(key)) {
+		     scores.support += score;
+		 } else if (["q25", "q26", "q27", "q28"].includes(key)) {
+		     scores.expression += score;
+		 } else if (["q29", "q30", "q31", "q32"].includes(key)) {
+		     scores.novelty += score;
+		 } else if (["q33", "q34", "q35", "q36"].includes(key)) {
+		     scores.growth += score;
+		 }
+		    }
+		
+		    // Atualizar termômetros
+		    updateThermometer("thermometer1", scores.security, 'explanation1', 4);
+		    updateThermometer("thermometer2", scores.connection, 'explanation2', 4);
+		    updateThermometer("thermometer3", scores.validation, 'explanation3', 4);
+		    updateThermometer("thermometer4", scores.autonomy, 'explanation4', 4);
+		    updateThermometer("thermometer5", scores.purpose, 'explanation5', 4);
+		    updateThermometer("thermometer6", scores.support, 'explanation6', 4);
+		    updateThermometer("thermometer7", scores.expression, 'explanation7', 4);
+		    updateThermometer("thermometer8", scores.novelty, 'explanation8', 4);
+		    updateThermometer("thermometer9", scores.growth, 'explanation9', 4);
+		
+		    // Exibir botão de WhatsApp
+		    document.getElementById("whatsappButton").style.display = "inline-block";
+		});
+		
+		function updateThermometer(id, value, explanationId, totalQuestions) {
+		    const elem = document.getElementById(id);
+		    const percentage = (value / (totalQuestions * 5)) * 100;
+		    let color = "red";
+		
+		    if (percentage >= 80) {
+		 color = "green";
+		    } else if (percentage >= 50) {
+		 color = "yellow";
+		    }
+		
+		    elem.style.width = percentage + "%";
+		    elem.style.backgroundColor = color;
+		
+		    if (percentage < 50) {
+		 document.getElementById(explanationId).style.display = 'block';
+		    } else {
+		 document.getElementById(explanationId).style.display = 'none';
+		    }
+		}
+		
+		function sendWhatsApp() {
+		    const name = document.getElementById('name').value;
+		    const age = document.getElementById('age').value;
+		    const date = document.getElementById('date').value;
+		    const results = `
+		Segurança e Estabilidade: ${document.getElementById('thermometer1').style.width}
+		Afeto e Conexão: ${document.getElementById('thermometer2').style.width}
+		Validação: ${document.getElementById('thermometer3').style.width}
+		Autonomia: ${document.getElementById('thermometer4').style.width}
+		Propósito e Direção: ${document.getElementById('thermometer5').style.width}
+		Apoio e Suporte: ${document.getElementById('thermometer6').style.width}
+		Expressão e Comunicação: ${document.getElementById('thermometer7').style.width}
+		Novidade e Desafios: ${document.getElementById('thermometer8').style.width}
+		Crescimento e Desenvolvimento: ${document.getElementById('thermometer9').style.width}`;
+		
+		    const whatsappMessage = encodeURIComponent(`Nome: ${name}\nIdade: ${age}\nData: ${date}\n${results}`);
+		    const whatsappUrl = `https://wa.me/5535984640729?text=${whatsappMessage}`;
+		
+		    window.open(whatsappUrl, '_blank');
+		}
+		
+	</script>
 </body>
 
 </html>
