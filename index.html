@@ -728,10 +728,12 @@
     document.getElementById('emotionScale').addEventListener('submit', async function (event) {
         event.preventDefault();
 
+        // Capture user input
         const name = document.getElementById('name').value;
         const age = document.getElementById('age').value;
         const date = document.getElementById('date').value;
 
+        // Initialize scores and mapping
         const scores = {
             security: 0,
             connection: 0,
@@ -772,7 +774,7 @@
         const responseData = {};
         const results = {};
 
-        // Processar respostas
+        // Process responses
         for (let [key, value] of answers.entries()) {
             let score = parseInt(value);
             if (invertedQuestions[key]) {
@@ -780,7 +782,7 @@
             }
             responseData[key] = score;
 
-            // Categorizar escores
+            // Categorize scores
             if (["q1", "q2", "q3", "q4"].includes(key)) {
                 scores.security += score;
             } else if (["q5", "q6", "q7", "q8"].includes(key)) {
@@ -802,7 +804,7 @@
             }
         }
 
-        // Interpretar escores
+        // Interpret scores
         for (let [key, value] of Object.entries(scores)) {
             let interpretation = interpretations.low;
             if (value >= 13) {
@@ -827,7 +829,7 @@
             `${data.explanation} - Escore: ${data.score} (${data.interpretation})`).join("\n")}`;
 
         try {
-            // Salvar dados no Firestore
+            // Save to Firestore
             await addDoc(collection(db, "respostas"), {
                 name: name,
                 age: age,
@@ -838,7 +840,7 @@
             });
             alert("Dados salvos com sucesso!");
 
-            // Atualizar botão de WhatsApp
+            // Update WhatsApp button
             const whatsappMessage = encodeURIComponent(resultsMessage);
             const whatsappUrl = `https://wa.me/5535984640729?text=${whatsappMessage}`;
             document.getElementById("whatsappButton").onclick = function () {
@@ -852,7 +854,6 @@
     });
 </script>
 
-	</script>
 </body>
 
 </html>
