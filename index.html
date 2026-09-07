@@ -474,42 +474,21 @@
         <div class="actions">
           <button class="button-primary" type="submit">Processar dados</button>
           <button class="button-danger" type="button" id="clearButton">Limpar e responder do zero</button>
-          <a class="button-link button-secondary" id="shareLinkButton" href="#" target="_blank" rel="noopener">Compartilhar link do teste</a>
-          <a class="button-link button-secondary" id="whatsappButton" href="#" target="_blank" rel="noopener" hidden>Enviar resultado ao psicólogo</a>
-        </div>
+
+</div>
 
         <p class="status" id="statusMessage" role="status" aria-live="polite"></p>
       </form>
     </main>
-
-    <section class="results-panel" id="resultsPanel" aria-labelledby="resultsTitle" hidden>
-      <h2 id="resultsTitle">Resultado por domínio</h2>
-      <p class="results-summary" id="resultsSummary"></p>
-      <div class="thermometers" id="thermometers"></div>
-    </section>
-
-    <footer class="footer">
+<footer class="footer">
       <p>Richelmy Murta∴, psicólogo clínico</p>
     </footer>
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-app.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.17.2/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzA...Fh7Y",
-      authDomain: "escala-emocional.firebaseapp.com",
-      projectId: "escala-emocional",
-      storageBucket: "escala-emocional.appspot.com",
-      messagingSenderId: "707186007593",
-      appId: "1:707186007593:web:007c0442e1a793e9f54638"
-    };
 
-    const PSYCHOLOGIST_WHATSAPP = "5535984640729";
-    const TEST_URL = "https://ricmurtapsicologia.github.io/Escala-de-Necessidades-Emocionais/";
-    const STORAGE_KEY = "escalaNecessidadesEmocionais:v2";
-    const MAX_DOMAIN_SCORE = 20;
+const MAX_DOMAIN_SCORE = 20;
 
     const scaleOptions = [
       { value: 1, label: "Nunca" },
@@ -549,35 +528,16 @@
       { id: "novelty", title: "Novidade e Desafios", description: "Abertura para experiências novas e flexibilidade.", questions: [{ text: "Tenho acesso a experiências novas e desafiadoras regularmente.", reverse: false }, { text: "Às vezes me sinto entediado com a rotina da minha vida.", reverse: true }, { text: "Eu busco ativamente novos aprendizados e experiências.", reverse: false }, { text: "Costumo evitar mudanças, mesmo quando elas podem ser positivas.", reverse: true }] },
       { id: "growth", title: "Crescimento e Desenvolvimento", description: "Progresso pessoal e sensação de evolução.", questions: [{ text: "Tenho oportunidades frequentes de crescimento pessoal e profissional.", reverse: false }, { text: "Muitas vezes sinto que minha vida está estagnada.", reverse: true }, { text: "Estou sempre buscando melhorar minhas habilidades e conhecimentos.", reverse: false }, { text: "Tenho dificuldade em progredir em minha vida ou carreira.", reverse: true }] }
     ];
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    const form = document.querySelector("#emotionScale");
+const form = document.querySelector("#emotionScale");
     const dateInput = document.querySelector("#date");
     const questionsContainer = document.querySelector("#questionsContainer");
     const resultsPanel = document.querySelector("#resultsPanel");
     const thermometers = document.querySelector("#thermometers");
     const resultsSummary = document.querySelector("#resultsSummary");
-    const whatsappButton = document.querySelector("#whatsappButton");
-    const shareLinkButton = document.querySelector("#shareLinkButton");
+
+
     const clearButton = document.querySelector("#clearButton");
-    const statusMessage = document.querySelector("#statusMessage");
-
-    const saveProgress = () => {
-      const data = Object.fromEntries(new FormData(form).entries());
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    };
-
-    const loadProgress = () => {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) { dateInput.valueAsDate = new Date(); return; }
-      try {
-        const data = JSON.parse(raw);
-        Object.entries(data).forEach(([key, value]) => { if (form.elements[key]) form.elements[key].value = value; });
-        if (!dateInput.value) dateInput.valueAsDate = new Date();
-      } catch { localStorage.removeItem(STORAGE_KEY); dateInput.valueAsDate = new Date(); }
-    };
+    const statusMessage = document.querySelector("#statusMessage");    const saveProgress = () => {};    const loadProgress = () => { if (!dateInput.value) dateInput.valueAsDate = new Date(); };
 
     const renderQuestions = () => {
       let questionNumber = 1;
@@ -714,31 +674,18 @@
       };
 
       renderResults(scores);
+      statusMessage.textContent = "";
 
-      try {
-        await addDoc(collection(db, "respostas"), {
-          ...data, scores, answers, 
-          resultText: buildFullResultText({ ...data, scores }),
-          createdAt: serverTimestamp()
-        });
-        statusMessage.textContent = "Sucesso! Resultado liberado para envio.";
-      } catch (e) {
-        statusMessage.textContent = "Erro ao salvar, mas você pode enviar o resultado.";
-      }
 
-      const waMsg = buildWhatsAppText({ ...data, scores });
-      whatsappButton.href = `https://wa.me/${PSYCHOLOGIST_WHATSAPP}?text=${encodeURIComponent(waMsg)}`;
-      whatsappButton.hidden = false;
     });
 
     clearButton.addEventListener("click", () => {
       if(confirm("Limpar tudo?")) {
-        localStorage.removeItem(STORAGE_KEY);
+
         location.reload();
       }
     });
 
-    shareLinkButton.href = `https://wa.me/?text=${encodeURIComponent("Acesse o teste: " + TEST_URL)}`;
     renderQuestions();
     loadProgress();
   </script>
