@@ -1,0 +1,49 @@
+name: Remove false local-storage copy
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/remove-false-local-storage-copy.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  sanitize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Correct public persistence copy only
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          old='Responda com honestidade, considerando como você costuma funcionar na maior parte do tempo. Suas respostas ficam salvas neste dispositivo para permitir continuação posterior. Você pode limpar tudo e recomeçar quando desejar.'
+          new='Responda com honestidade, considerando como você costuma funcionar na maior parte do tempo. As respostas desta página não ficam armazenadas neste dispositivo.'
+          if old in s:
+              s=s.replace(old,new,1)
+          elif new not in s:
+              raise SystemExit('EXPECTED_NOTICE_NOT_FOUND')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Validate copy only
+        shell: bash
+        run: |
+          ! grep -Fq 'Suas respostas ficam salvas neste dispositivo' index.html
+          grep -Fq 'As respostas desta página não ficam armazenadas neste dispositivo.' index.html
+          grep -q 'const saveProgress = () => {}' index.html
+          grep -q 'id="questionsContainer"' index.html
+      - name: Commit correction
+        shell: bash
+        run: |
+          if git diff --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Corrige informação pública sobre armazenamento local'
+          git push
