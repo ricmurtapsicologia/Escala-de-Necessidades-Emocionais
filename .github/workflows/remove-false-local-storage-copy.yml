@@ -10,6 +10,9 @@ on:
 permissions:
   contents: write
 
+env:
+  COPY_SANITIZER_VERSION: '1.0.0'
+
 jobs:
   sanitize:
     runs-on: ubuntu-latest
